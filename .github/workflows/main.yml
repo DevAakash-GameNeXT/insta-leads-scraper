@@ -1,0 +1,33 @@
+name: Insta Scraper Automation
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'  # Runs every 6 hours
+  workflow_dispatch:       # Allows manual trigger
+
+jobs:
+  run_scraper:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run scraper
+        run: python scraper.py
+
+      - name: Commit and Push Results
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions@github.com"
+          git add gamenext.csv
+          git commit -m "Updated scraped data" || echo "No changes to commit"
+          git push
